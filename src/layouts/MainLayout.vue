@@ -3,10 +3,10 @@
     <q-header elevated>
       <q-toolbar>
         
-        <!-- <q-icon name="west" /> -->
         <q-btn 
         v-go-back.single
-        v-if="$route.fullPath == '/chat'"
+        class = "absolute-left"
+        v-if="$route.fullPath.includes('/chat')"
         dense
         flat  
         icon="west" 
@@ -15,13 +15,27 @@
           {{ title }}
         </q-toolbar-title>
         <q-btn 
+        v-if="!userDetails.name"
         class= "absolute-right q-pr-sm"
         no-caps
         dense
         flat  
-        to= "/auth"
         icon="account_circle" 
-        label="Login"/>
+        
+        >
+        Login
+        </q-btn>
+        <q-btn 
+        v-else
+        class= "absolute-right q-pr-sm"
+        no-caps
+        dense
+        flat  
+        icon="account_circle" 
+        @click="userLogOut"
+        >
+        Logout<br>{{ userDetails.name }}
+        </q-btn>
       </q-toolbar>
     </q-header>
 
@@ -34,24 +48,33 @@
 </template>
 
 <script>
+import { mapState, mapActions } from 'vuex'
+import mixinOtherUserDetails from '../mixins/mixin-other-user-detail.js'
 
 export default {
-  name: 'MainLayout',
+  
+  mixins: [mixinOtherUserDetails],
   data () {
     return {
     }
   },
   computed: {
+    ...mapState('store',['userDetails']),
     title() {
       let currentPath = this.$route.fullPath
       if(currentPath == '/') return 'SmackChat'
-      else if(currentPath == '/chat') return 'Chat'
+      else if(currentPath.includes('/chat')) return this.otherUserDetails.name
       else if(currentPath == '/user') return 'User'
       else if(currentPath == '/auth') return 'Authentication'
     }
+  },
+  methods: {
+    ...mapActions('store', ['userLogOut']),
   }
 }
 </script>
-<style lang='sass'>
-
+<style lang='stylus'>
+  .q-btn__wrapper
+    .q-btn__content
+      line-height 15px
 </style>
